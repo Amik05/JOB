@@ -183,6 +183,48 @@ Make sure the Google account you authenticated with has edit access to the sprea
 
 ---
 
+## Using a School or Work Email (IMAP)
+
+If your email is a school or work Microsoft 365 account, the Outlook option above likely won't work without IT admin approval. IMAP is the practical alternative — it works with any email provider (school Outlook, Gmail, Yahoo, etc.) using a simple username and app password, with no Azure registration required.
+
+### Step 1 — Enable IMAP on your account
+
+**For school Microsoft 365 / Outlook:**
+1. Sign into [outlook.office.com](https://outlook.office.com)
+2. Click the gear icon (Settings) → **View all Outlook settings**
+3. Go to **Mail → Sync email**
+4. Make sure **IMAP** is turned on
+
+**For Gmail (alternative to the OAuth flow):**
+1. Go to [myaccount.google.com/security](https://myaccount.google.com/security)
+2. Enable 2-Step Verification if not already on
+3. Go to **App Passwords** → generate one for "Mail"
+
+### Step 2 — Get an app password
+
+If your account has MFA / two-factor authentication enabled (most school accounts do), you cannot use your regular password. You need an app password:
+
+**Microsoft 365:**
+1. Go to [mysignins.microsoft.com/security-info](https://mysignins.microsoft.com/security-info)
+2. Click **Add method → App password**
+3. Name it `JB` and copy the generated password
+
+> If you don't see "App password" as an option, your school's IT policy may block it. Ask your IT helpdesk to enable app passwords for your account, or use email forwarding to a personal Gmail instead.
+
+### Step 3 — Configure `.env`
+
+```
+EMAIL_PROVIDER=imap
+IMAP_SERVER=outlook.office365.com   # or imap.gmail.com for Gmail
+IMAP_PORT=993
+IMAP_USERNAME=your-email@school.edu
+IMAP_PASSWORD=your-app-password-here
+```
+
+Then run `python main.py` — no browser window will open, it connects directly.
+
+---
+
 ## Using Outlook / Microsoft 365 Instead of Gmail
 
 J*B supports both Gmail and Outlook. To switch, set `EMAIL_PROVIDER=outlook` in your `.env`.

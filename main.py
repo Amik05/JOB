@@ -23,6 +23,16 @@ def _build_email_client():
             sys.exit(1)
         return OutlookClient(token)
 
+    if provider == "imap":
+        from imap_client import IMAPClient
+        print("Connecting via IMAP...")
+        try:
+            client = IMAPClient()
+        except ValueError as e:
+            print(f"\nERROR: {e}")
+            sys.exit(1)
+        return client
+
     # Default: Gmail
     from gmail_client import GmailClient, get_credentials
     print("Authenticating with Google (Gmail)...")
