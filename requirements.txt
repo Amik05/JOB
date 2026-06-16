@@ -5,3 +5,5 @@ google-api-python-client
 google-generativeai
 apscheduler
 python-dotenv
+msal
+requests

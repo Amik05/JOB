@@ -181,7 +181,45 @@ Make sure the Google account you authenticated with has edit access to the sprea
 
 ---
 
+---
+
+## Using Outlook / Microsoft 365 Instead of Gmail
+
+J*B supports both Gmail and Outlook. To switch, set `EMAIL_PROVIDER=outlook` in your `.env`.
+
+> Note: Google Sheets is still used for the tracker regardless of email provider, so you still need `credentials.json` from Google Cloud Console (Step 1 above) for Sheets access.
+
+### Azure App Registration
+
+1. Go to [portal.azure.com](https://portal.azure.com) and sign in.
+2. Search for **App registrations** → **New registration**.
+3. Name: `JB` — Supported account types: **Accounts in any organizational directory and personal Microsoft accounts** → **Register**.
+4. Copy the **Application (client) ID** — this is your `OUTLOOK_CLIENT_ID`.
+5. In the left menu go to **Authentication** → **Add a platform → Mobile and desktop applications**.
+6. Check the box for `https://login.microsoftonline.com/common/oauth2/nativeclient` → **Configure**.
+7. Under **Advanced settings** set **Allow public client flows** to **Yes** → **Save**.
+8. In the left menu go to **API permissions → Add a permission → Microsoft Graph → Delegated permissions**.
+9. Search for and add `Mail.ReadWrite` → **Add permissions**.
+10. Click **Grant admin consent** (if prompted — only needed for work/school accounts).
+
+### Configure `.env` for Outlook
+
+```
+EMAIL_PROVIDER=outlook
+OUTLOOK_CLIENT_ID=your-azure-app-client-id
+OUTLOOK_TENANT_ID=common          # use "common" for personal accounts
+                                   # use your tenant ID for work/school accounts
+```
+
+Leave the Gmail-related `credentials.json` in place — it is still used for Google Sheets.
+
+### First Outlook Run
+
+A browser window will open asking you to sign into your Microsoft account. After approving, `outlook_token.json` is saved and you will not be asked again for ~90 days.
+
+---
+
 ## Security Notes
 
-- `credentials.json`, `token.json`, and `.env` are all in `.gitignore` and must never be committed to version control.
+- `credentials.json`, `token.json`, `outlook_token.json`, and `.env` are all in `.gitignore` and must never be committed to version control.
 - The agent never stores or logs the full email body — only the AI-extracted summary is written to the sheet.

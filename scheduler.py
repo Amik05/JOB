@@ -1,14 +1,20 @@
 from collections import Counter
 from datetime import datetime
+from typing import Protocol, runtime_checkable
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 from classifier import Classifier
-from gmail_client import GmailClient
 from sheets_client import SheetsClient
 
 
-def run_job(gmail: GmailClient, sheets: SheetsClient, classifier: Classifier) -> None:
+@runtime_checkable
+class EmailClient(Protocol):
+    def fetch_recent_emails(self) -> list[dict]: ...
+    def mark_as_read(self, msg_id: str) -> None: ...
+
+
+def run_job(gmail: EmailClient, sheets: SheetsClient, classifier: Classifier) -> None:
     print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Running J*B scan...")
 
     emails = gmail.fetch_recent_emails()
@@ -50,7 +56,7 @@ def run_job(gmail: GmailClient, sheets: SheetsClient, classifier: Classifier) ->
 class Scheduler:
     def __init__(
         self,
-        gmail: GmailClient,
+        gmail: EmailClient,
         sheets: SheetsClient,
         classifier: Classifier,
         interval_hours: int = 2,
