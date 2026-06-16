@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from typing import Optional
 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -69,7 +70,7 @@ class SheetsClient:
                 body={"values": [HEADERS]},
             ).execute()
 
-    def _find_existing_row(self, rows: list[list], company: str, role: str) -> int | None:
+    def _find_existing_row(self, rows: list, company: str, role: str) -> Optional[int]:
         """
         Return the 0-based row index of an existing entry matching company+role,
         or None if not found. Row 0 is the header.

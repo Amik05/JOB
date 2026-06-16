@@ -1,8 +1,9 @@
 import json
 import os
 import re
+from typing import Optional
 
-import google.generativeai as genai
+from google import genai
 
 MODEL_NAME = "gemini-2.5-flash"
 
@@ -33,8 +34,7 @@ class Classifier:
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             raise ValueError("GEMINI_API_KEY is not set in .env")
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(MODEL_NAME)
+        self.client = genai.Client(api_key=api_key)
 
     def _strip_fences(self, text: str) -> str:
         """Remove markdown code fences that the model may include despite instructions."""
@@ -43,7 +43,7 @@ class Classifier:
         text = re.sub(r"\s*```$", "", text)
         return text.strip()
 
-    def classify(self, email: dict) -> dict | None:
+    def classify(self, email: dict) -> Optional[dict]:
         """
         Classify a single email dict.
         Returns parsed classification dict, or None if not job-related or unparseable.
@@ -55,7 +55,10 @@ class Classifier:
         )
 
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=MODEL_NAME,
+                contents=prompt,
+            )
             raw = response.text
         except Exception as e:
             print(f"  Gemini API error for email '{email.get('subject')}': {e}")

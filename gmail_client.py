@@ -3,6 +3,7 @@ import time
 import base64
 import email
 from datetime import datetime, timedelta
+from typing import Optional
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -55,7 +56,7 @@ class GmailClient:
 
         return ""
 
-    def _fetch_message(self, msg_id: str) -> dict | None:
+    def _fetch_message(self, msg_id: str) -> Optional[dict]:
         """Fetch a single message with retry on rate limit."""
         for attempt in range(3):
             try:
