@@ -1,10 +1,34 @@
+# Secrets & auth tokens — never commit these
 .env
 credentials.json
 token.json
 outlook_token.json
+
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
-.DS_Store
+*.pyd
+
+# Virtual environments (covers any naming convention)
 .venv/
 venv/
+.vev/
+env/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Cursor IDE
+.cursor/
+
+# Logs
+*.log
+
+# Byte-compiled / distribution
+*.egg-info/
+dist/
+build/
+
