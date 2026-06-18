@@ -261,6 +261,82 @@ A browser window will open asking you to sign into your Microsoft account. After
 
 ---
 
+---
+
+## Deploying to the Cloud (Railway)
+
+Running J*B locally means it stops when you close your laptop. Deploy it to [Railway](https://railway.app) to keep it running 24/7 for free.
+
+### Why Railway?
+
+- Free tier with $5/month credit (more than enough for a lightweight Python worker)
+- Deploys directly from your GitHub repo
+- Persistent background worker — never spins down
+- Simple environment variable management
+
+### Step 1 — Prepare your Google token for the cloud
+
+The OAuth browser flow can't run on a server, so you upload your already-generated token as an environment variable.
+
+In your terminal, run:
+
+```bash
+cat token.json
+```
+
+Copy the entire output — it's a JSON string. You'll paste this as `GOOGLE_TOKEN_JSON` in Railway in a moment.
+
+### Step 2 — Push your code to GitHub
+
+Your code is already on GitHub. Make sure it's up to date:
+
+```bash
+git push
+```
+
+> Confirm that `token.json`, `.env`, and `credentials.json` are NOT in your repo (they're in `.gitignore`).
+
+### Step 3 — Create a Railway project
+
+1. Go to [railway.app](https://railway.app) and sign up / log in with GitHub
+2. Click **New Project → Deploy from GitHub repo**
+3. Select your `JOB` repository
+4. Railway will detect the `railway.toml` and start building automatically
+
+### Step 4 — Add environment variables
+
+In your Railway project → **Variables** tab, add each of these:
+
+| Variable | Value |
+|---|---|
+| `GOOGLE_TOKEN_JSON` | The full contents of your `token.json` file |
+| `GEMINI_API_KEY` | Your Gemini API key |
+| `SPREADSHEET_ID` | Your Google Sheet ID |
+| `EMAIL_PROVIDER` | `gmail` |
+
+> Do NOT add `OUTLOOK_CLIENT_ID`, `IMAP_USERNAME`, etc. unless you're using those providers.
+
+### Step 5 — Deploy
+
+Railway will automatically redeploy when you push to GitHub. You can also click **Deploy** manually.
+
+In the **Logs** tab you should see:
+
+```
+J*B is running. Monitoring your inbox every 2 hours.
+```
+
+### Keeping the token fresh
+
+Google OAuth tokens expire and get refreshed automatically. When running in the cloud, J*B prints the new token value to the logs after a refresh. If you ever see an authentication error:
+
+1. Re-run `python main.py` locally once (it will refresh `token.json`)
+2. Copy the new `token.json` contents
+3. Update `GOOGLE_TOKEN_JSON` in Railway's Variables tab
+4. Railway will redeploy automatically
+
+---
+
 ## Security Notes
 
 - `credentials.json`, `token.json`, `outlook_token.json`, and `.env` are all in `.gitignore` and must never be committed to version control.

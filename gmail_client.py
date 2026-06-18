@@ -1,3 +1,4 @@
+import json
 import os
 import time
 import base64
@@ -21,18 +22,44 @@ TOKEN_FILE = "token.json"
 
 
 def get_credentials() -> Credentials:
+    """
+    Load OAuth credentials. Priority order:
+    1. GOOGLE_TOKEN_JSON env var (used in cloud/headless environments)
+    2. token.json file on disk (used locally)
+    3. Interactive browser flow (first-time local setup only)
+    """
     creds = None
-    if os.path.exists(TOKEN_FILE):
+
+    token_json_env = os.getenv("GOOGLE_TOKEN_JSON")
+    if token_json_env:
+        # Cloud mode: token is stored as an environment variable
+        creds = Credentials.from_authorized_user_info(
+            json.loads(token_json_env), SCOPES
+        )
+    elif os.path.exists(TOKEN_FILE):
         creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
+            # Persist refreshed token back to env source or file
+            if token_json_env:
+                # Print reminder — in Railway update the env var with the new value
+                print("  Token refreshed. Update GOOGLE_TOKEN_JSON in Railway with:")
+                print(f"  {creds.to_json()}")
+            else:
+                with open(TOKEN_FILE, "w") as token_file:
+                    token_file.write(creds.to_json())
         else:
+            if token_json_env:
+                raise RuntimeError(
+                    "GOOGLE_TOKEN_JSON is set but the token is invalid and cannot be "
+                    "refreshed headlessly. Re-authenticate locally and update the env var."
+                )
             flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
             creds = flow.run_local_server(port=0)
-        with open(TOKEN_FILE, "w") as token_file:
-            token_file.write(creds.to_json())
+            with open(TOKEN_FILE, "w") as token_file:
+                token_file.write(creds.to_json())
 
     return creds
 
