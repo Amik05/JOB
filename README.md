@@ -263,6 +263,57 @@ A browser window will open asking you to sign into your Microsoft account. After
 
 ---
 
+## Deploying to the Cloud (GitHub Actions — Free)
+
+The easiest free option is **GitHub Actions** — it runs on GitHub's own servers on a cron schedule, requires no account beyond GitHub, and uses your existing repo. Free for all accounts (2,000 minutes/month, each scan takes ~30 seconds).
+
+### How it works
+
+Instead of a persistent process, GitHub Actions wakes up every 2 hours, runs `run_once.py` (one scan), writes results to your Sheet, and shuts down. No server to manage.
+
+### Step 1 — Add your secrets to GitHub
+
+Your API keys and OAuth token must be stored as **GitHub Secrets** (encrypted, never visible in logs).
+
+1. Go to your repo on GitHub → **Settings → Secrets and variables → Actions**
+2. Click **New repository secret** for each of these:
+
+| Secret name | Value |
+|---|---|
+| `GOOGLE_TOKEN_JSON` | Full contents of your local `token.json` file |
+| `GEMINI_API_KEY` | Your Gemini API key |
+| `SPREADSHEET_ID` | Your Google Sheet ID |
+| `EMAIL_PROVIDER` | `gmail` |
+
+To get the value for `GOOGLE_TOKEN_JSON`, run this in your terminal:
+```bash
+cat token.json
+```
+Copy the entire output and paste it as the secret value.
+
+### Step 2 — Push the workflow
+
+The workflow file is already in `.github/workflows/scan.yml`. Just push to GitHub:
+
+```bash
+git push
+```
+
+GitHub Actions will pick it up automatically.
+
+### Step 3 — Verify it works
+
+Go to your repo → **Actions** tab. You'll see the **J*B Inbox Scan** workflow listed. Click **Run workflow** to trigger an immediate test run and check the logs.
+
+After that it runs automatically every 2 hours.
+
+### Triggering a manual scan
+
+Anytime you want to run an immediate scan without waiting for the schedule:
+1. Go to **Actions → J*B Inbox Scan → Run workflow → Run workflow**
+
+---
+
 ## Deploying to the Cloud (Railway)
 
 Running J*B locally means it stops when you close your laptop. Deploy it to [Railway](https://railway.app) to keep it running 24/7 for free.
