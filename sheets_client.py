@@ -44,7 +44,7 @@ def _a1(row: int, col: int) -> str:
 class SheetsClient:
     def __init__(self, creds: Credentials):
         self.service = build("sheets", "v4", credentials=creds)
-        self.spreadsheet_id = os.getenv("SPREADSHEET_ID")
+        self.spreadsheet_id = os.getenv("SPREADSHEET_ID", "").strip()
         if not self.spreadsheet_id:
             raise ValueError("SPREADSHEET_ID is not set in .env")
         self._ensure_headers()
