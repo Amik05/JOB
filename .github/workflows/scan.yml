@@ -1,9 +1,10 @@
 name: J*B Inbox Scan
 
 on:
-  schedule:
-    # Runs every 2 hours
-    - cron: "0 */2 * * *"
+  # Disable schedule loop for now
+  # schedule:
+  #   # Runs every 2 hours
+  #   - cron: "0 */2 * * *"
   workflow_dispatch:
     # Allows you to trigger a manual scan from the GitHub Actions tab
 
